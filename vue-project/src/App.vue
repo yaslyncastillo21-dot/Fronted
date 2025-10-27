@@ -2,7 +2,7 @@
   <div class="main-container">
     <div class="app-card">
       <h1 class="main-title">
-        Sistema de Registro de Clientes
+        Registra tus Clientes
       </h1>
 
       <div class="form-section">
@@ -15,41 +15,46 @@
         
         <form @submit.prevent="agregarCliente" class="form-grid">
           <div class="form-group full-width">
-            <label for="input-nombre" class="form-label">Nombre Completo:</label>
-            <input
-              id="input-nombre"
-              v-model="nuevoCliente.nombre"
-              type="text"
-              required
-              placeholder="Ej: Ana Gómez"
-              class="form-input"
-            />
+            <div class="input-wrapper">
+              <input
+                id="input-nombre"
+                v-model="nuevoCliente.nombre"
+                type="text"
+                required
+                placeholder=" "
+                class="form-input"
+              />
+              <label for="input-nombre" class="form-label">Nombre Completo:</label>
+            </div>
           </div>
           
           <div class="split-group">
-            
             <div class="form-group">
-              <label for="input-telefono" class="form-label">Teléfono:</label>
-              <input
-                id="input-telefono"
-                v-model="nuevoCliente.telefono"
-                type="tel"
-                required
-                placeholder="Ej: 809-555-1234"
-                class="form-input"
-              />
+              <div class="input-wrapper">
+                <input
+                  id="input-telefono"
+                  v-model="nuevoCliente.telefono"
+                  type="tel"
+                  required
+                  placeholder=" "
+                  class="form-input"
+                />
+                <label for="input-telefono" class="form-label">Teléfono:</label>
+              </div>
             </div>
             
             <div class="form-group">
-              <label for="input-direccion" class="form-label">Dirección:</label>
-              <input
-                id="input-direccion"
-                v-model="nuevoCliente.direccion"
-                type="text"
-                required
-                placeholder="Ej: Calle 1, No. 5, Sector Centro"
-                class="form-input"
-              />
+              <div class="input-wrapper">
+                <input
+                  id="input-direccion"
+                  v-model="nuevoCliente.direccion"
+                  type="text"
+                  required
+                  placeholder=" "
+                  class="form-input"
+                />
+                <label for="input-direccion" class="form-label">Dirección:</label>
+              </div>
             </div>
           </div>
           
@@ -65,7 +70,8 @@
             </span>
           </button>
         </form>
-        </div>
+      </div>
+      
       <ClienteList :clientes="clientes" />
       
       <div v-if="showModal" class="modal-backdrop" @click="showModal = false">
@@ -90,10 +96,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-// CAMBIO: Importamos el nuevo componente de lista (debe ser creado)
 import ClienteList from './components/ClienteList.vue'; 
 
-// CAMBIO: Definición de la interfaz Cliente, basada en la consulta SQL.
 interface Cliente {
   id_cliente: number;
   nombre: string;
@@ -101,13 +105,10 @@ interface Cliente {
   direccion: string;
 }
 
-// CAMBIO: Actualizamos la URL de la API para el endpoint de clientes.
 const API_URL = 'http://localhost:2000/api/clientes';
 
-// CAMBIO: Inicializamos los datos del nuevo cliente con los campos correspondientes.
 const nuevoCliente = ref({ nombre: '', telefono: '', direccion: '' }); 
 
-// CAMBIO: Usamos 'clientes' en lugar de 'estudiantes' y el tipo Cliente.
 const clientes = ref<Cliente[]>([]); 
 const showModal = ref(false);
 const modalTitle = ref('');
@@ -121,14 +122,12 @@ const mostrarModal = (title: string, message: string, variant = 'success') => {
   showModal.value = true;
 };
 
-// CAMBIO: Renombramos y actualizamos la función de carga.
 const cargarClientes = async () => {
   try {
     const res = await fetch(API_URL);
     if (!res.ok) {
       throw new Error(`Error HTTP: ${res.status}`);
     }
-    // CAMBIO: Asignamos a 'clientes'.
     clientes.value = await res.json(); 
   } catch (error: any) {
     console.error('Error al cargar clientes:', error);
@@ -139,13 +138,10 @@ const cargarClientes = async () => {
   }
 };
 
-// CAMBIO: Renombramos y actualizamos la función de agregar.
 const agregarCliente = async () => {
   try {
-    // Los datos se envían tal cual están en nuevoCliente.value, no hay necesidad de parsear un número como la edad.
     const dataToSend = nuevoCliente.value; 
 
-    // Opcional: Podrías añadir validaciones específicas para teléfono o dirección aquí si fuera necesario.
     if (!dataToSend.nombre.trim() || !dataToSend.telefono.trim() || !dataToSend.direccion.trim()) {
       throw new Error('Todos los campos son obligatorios.');
     }
@@ -161,172 +157,273 @@ const agregarCliente = async () => {
       throw new Error(errorData.message || `Error del servidor: ${response.status}`);
     }
 
-    // CAMBIO: Reseteamos los campos del nuevo cliente.
     nuevoCliente.value = { nombre: '', telefono: '', direccion: '' }; 
     mostrarModal('✅ Éxito', 'El cliente fue agregado correctamente.', 'success');
-    await cargarClientes(); // Recargar la lista de clientes
+    await cargarClientes(); 
   } catch (error: any) {
     console.error('Error al agregar cliente:', error);
-    // CAMBIO: Mensaje adaptado.
     mostrarModal('❌ Error al Registrar', error.message || 'Ocurrió un error inesperado al intentar registrar el cliente.', 'error'); 
   }
 };
 
-// CAMBIO: Usamos cargarClientes al montar.
 onMounted(cargarClientes); 
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* ESTILOS BASE */
 /* PALETA DE COLORES */
 /* Primario Oscuro: #6A040F (Rosewood) */
 /* Primario Claro: #9A0D1B (Carmin) */
 /* Fondo de Sección: #550816 (Chocolate cosmos) */
 /* Fondo Principal: #FAEAEB (Rosa muy claro) */
+/* Botón/Éxito: #1a73e8 (un azul vibrante, o puedes usar un verde oscuro/rojo más apagado si prefieres) */
 
 
 /* ESTILOS BASE */
 .main-container {
   min-height: 100vh;
-  /* Fondo principal muy claro para contraste */
   background-color: #FAEAEB; /* Rosa muy claro */
   display: flex;
-  align-items: center; /* Centrar el formulario verticalmente */
+  align-items: flex-start; /* Alinea arriba para dar espacio al título */
   justify-content: center;
-  padding: 2rem 1rem;
+  padding: 3rem 1rem; /* Más padding para el contenedor principal */
   font-family: 'Inter', sans-serif;
 }
 
-/* **ELIMINACIÓN de .app-card:** Ahora el formulario es el contenedor principal y se centra */
-
-/* NUEVO CONTENEDOR DE FORMULARIO: Usa la estética del .form-section anterior */
-.form-container {
-  max-width: 32rem; /* Más compacto, max-w-lg */
+.app-card {
+  background-color: #550816; /* Chocolate cosmos para el fondo principal de la tarjeta */
+  border-radius: 1rem; /* Bordes más redondeados */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Sombra suave pero visible */
+  padding: 2.5rem 2rem; /* Espaciado interno generoso */
+  max-width: 600px; /* Ancho máximo para el formulario */
   width: 100%;
-  padding: 3rem 2rem; /* Más padding vertical */
-  /* Fondo de sección Rosewood/Chocolate Cosmos para un look rico y compacto */
-  background-color: #550816; /* Chocolate cosmos */
-  border-radius: 0.5rem; /* Bordes menos redondeados (rounded-lg) */
-  /* Sombra más marcada para definir el contenedor */
-  box-shadow: 0 25px 50px -12px rgba(106, 4, 15, 0.4);
-  border: 2px solid #6A040F; /* Borde más definido */
-  color: white; /* Asegurar que el texto sea legible */
+  color: #E0E0E0; /* Texto claro general */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem; /* Espacio entre secciones */
+  border: 1px solid #6A040F; /* Borde sutil del color primario oscuro */
 }
 
 .main-title {
-  font-size: 2rem; /* Un poco más pequeño */
-  font-weight: 700;
-  /* Color Rosewood */
-  color: #9A0D1B; /* Carmin para el título principal */
+  font-size: 2.5rem; /* Título principal grande */
+  font-weight: 800; /* Extra bold */
+  color: #33060a; /* Carmín para el título principal */
   text-align: center;
-  margin-bottom: 3rem; /* Más espacio */
+  margin-bottom: 1.5rem; /* Espacio debajo del título */
+  line-height: 1.2;
 }
 
 /* --- ESTILOS DEL FORMULARIO --- */
-/* Se eliminan .form-section y .form-title para simplificar la estructura */
+.form-section {
+  background-color: #6A040F; /* Rosewood para el fondo del formulario, resalta */
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
 
-.form-title-h2 { /* Nuevo título para secciones internas si las hubiera */
-    font-size: 1.25rem; /* text-xl */
-    font-weight: 600;
-    color: #9A0D1B; /* Carmin */
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(154, 13, 27, 0.3); /* Línea divisoria sutil */
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.form-title {
+  font-size: 1.6rem; /* Título del formulario más grande */
+  font-weight: 700;
+  color: #33060a; /* Rosa muy claro para el título del formulario */
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(250, 234, 235, 0.2); /* Línea divisoria más clara */
 }
 
 .title-icon {
-  height: 1.25rem;
-  width: 1.25rem;
-  color: #9A0D1B;
+  height: 1.8rem; /* Icono más grande */
+  width: 1.8rem;
+  color: #33060a; /* Rosa muy claro para el icono */
 }
 
 .form-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem; /* Más compacto */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Espaciado entre grupos de formulario */
 }
 
-/* GRUPO DE FORMULARIO CON ESTILO MÁS MINIMALISTA */
+.split-group {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap; /* Permite que los campos se apilen en pantallas pequeñas */
+}
+
+.split-group .form-group {
+  flex: 1; /* Distribuye el espacio equitativamente */
+  min-width: 150px; /* Evita que los campos se hagan demasiado pequeños */
+}
+
+/* GRUPO DE FORMULARIO CON ESTILO FLOTANTE */
 .form-group {
-    position: relative; /* Necesario para el estilo de input flotante */
-    margin-bottom: 0;
+  position: relative;
+  margin-bottom: 0; /* Ya no necesitamos margen inferior aquí */
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
 }
 
 .form-label {
-  display: block;
-  font-size: 0.75rem; /* Texto de etiqueta más pequeño */
-  font-weight: 500;
-  color: #c4c4c4; /* Gris claro para las etiquetas */
-  margin-bottom: 0.1rem; /* Mantenemos la etiqueta cerca del input */
-  position: absolute; /* Para el efecto flotante */
-  top: 0.3rem;
+  position: absolute;
+  top: 1rem; /* Posición inicial de la etiqueta */
   left: 1rem;
-  transition: all 0.2s ease;
+  font-size: 1rem;
+  color: #E0E0E0; /* Color inicial de la etiqueta */
   pointer-events: none;
+  transition: all 0.2s ease;
+  transform-origin: left top;
 }
 
 .form-input {
   width: 100%;
-  padding: 1rem 1rem 0.5rem; /* Más padding en la parte superior para el texto flotante */
-  background-color: #43070f; /* Fondo del input un poco más claro que el contenedor */
-  border: 1px solid #6A040F; /* Borde Rosewood */
-  border-radius: 0.25rem; /* Bordes muy sutiles */
-  box-shadow: none; /* Quitamos la sombra de la entrada */
+  padding: 1.5rem 1rem 0.75rem; /* Más padding para dejar espacio a la etiqueta flotante */
+  background-color: #550816; /* Chocolate cosmos para los inputs */
+  border: 1px solid #9A0D1B; /* Borde carmín */
+  border-radius: 0.5rem;
+  color: #FFFFFF; /* Texto blanco */
+  font-size: 1rem;
   transition: all 0.2s ease;
   outline: none;
-  color: #ffffff; /* Texto blanco en el input */
 }
 
-.form-input:hover {
-    border-color: #9A0D1B; /* Carmin en hover */
-    box-shadow: none;
-}
-
-.form-input:focus {
-  border-color: #9A0D1B; /* Carmin en focus */
-  box-shadow: 0 0 0 1px #9A0D1B;
-  background-color: #43070f;
+.form-input::placeholder {
+  color: transparent; /* Ocultamos el placeholder, la etiqueta lo reemplaza */
 }
 
 /* Estilos para mover la etiqueta cuando el input está enfocado o tiene contenido */
 .form-input:focus + .form-label,
 .form-input:not(:placeholder-shown) + .form-label {
-    top: 0.1rem;
-    font-size: 0.65rem;
-    color: #9A0D1B; /* Carmin para la etiqueta activa */
+  top: 0.5rem; /* Posición más alta cuando está activo */
+  font-size: 0.75rem; /* Más pequeño */
+  color: #FAEAEB; /* Rosa muy claro cuando está activo */
+  transform: translateY(-5px); /* Pequeño ajuste para evitar que tape el borde */
 }
 
+.form-input:hover {
+  border-color: #FAEAEB; /* Rosa muy claro en hover */
+}
+
+.form-input:focus {
+  border-color: #FAEAEB; /* Rosa muy claro en focus */
+  box-shadow: 0 0 0 2px rgba(250, 234, 235, 0.5); /* Sombra de focus sutil */
+  background-color: #43070f; /* Ligeramente más oscuro en focus */
+}
 
 .submit-button {
   width: 100%;
-  /* Gradiente entre Rosewood y Carmin */
-  background-image: linear-gradient(to right, #6A040F, #9A0D1B);
-  color: white;
+  background-image: linear-gradient(to right, #9A0D1B, #6A040F); /* Gradiente de Carmín a Rosewood */
+  color: rgb(57, 9, 9);
   font-weight: 700;
-  padding: 1rem 1rem; /* Un poco más alto */
-  border-radius: 0.5rem; /* Bordes sutiles */
-  /* Sombra Rosewood */
-  box-shadow: 0 5px 15px -5px rgba(106, 4, 15, 0.6);
+  padding: 1.2rem 1.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 20px -8px rgba(154, 13, 27, 0.7); /* Sombra más pronunciada */
   transition: all 0.3s ease;
-  margin-top: 2rem; /* Más margen superior */
+  margin-top: 1.5rem;
   border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  font-size: 1.1rem;
 }
 
 .submit-button:hover {
-  /* Gradiente más oscuro/profundo en hover */
-  background-image: linear-gradient(to right, #550816, #6A040F);
-  transform: translateY(-2px); /* Un pequeño levantamiento para el efecto */
-  box-shadow: 0 8px 20px -5px rgba(106, 4, 15, 0.8);
+  background-image: linear-gradient(to right, #6A040F, #9A0D1B); /* Invertir gradiente o hacerlo más oscuro */
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px -10px rgba(154, 13, 27, 0.9);
 }
 
 .submit-button:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(154, 13, 27, 0.7);
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(250, 234, 235, 0.6); /* Anillo de focus más notorio */
 }
+
+.button-icon {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+/* --- ESTILOS DEL MODAL (Ajuste de colores) --- */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente oscuro */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: #550816; /* Chocolate cosmos para el fondo del modal */
+  border-radius: 1rem;
+  padding: 2.5rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  color: #E0E0E0;
+  border: 1px solid #6A040F;
+}
+
+.modal-icon {
+  font-size: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-title-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  color: #FAEAEB; /* Rosa muy claro para el título del modal */
+}
+
+.modal-message {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  color: #C4C4C4;
+}
+
+.modal-button {
+  padding: 0.8rem 2rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  color: white;
+}
+
+.modal-button-success {
+  background-color: #6A040F; /* Rosewood para éxito */
+  box-shadow: 0 4px 10px rgba(106, 4, 15, 0.4);
+}
+
+.modal-button-success:hover {
+  background-color: #9A0D1B; /* Carmín en hover */
+  transform: translateY(-1px);
+}
+
+.modal-button-error {
+  background-color: #9A0D1B; /* Carmín para error */
+  box-shadow: 0 4px 10px rgba(154, 13, 27, 0.4);
+}
+
+.modal-button-error:hover {
+  background-color: #6A040F; /* Rosewood en hover */
+  transform: translateY(-1px);
+}
+
 </style>
